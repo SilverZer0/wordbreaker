@@ -230,8 +230,8 @@ class Ball {
         }
         this.moveX = Math.cos((this.rot+270)*Math.PI/180)
         this.moveY = Math.sin((this.rot+270)*Math.PI/180)
-        this.reflected = {x:false, y:false};
         //pad
+        this.reflected = {x:false, y:false};
         var padX = pad.Cor[0]
         for(var i=0;i<5;i++){
             if(this.collisionHandler([padX+i*30+10*(i>0), 800, 10+10*(i==0 || i==4), -19])){
@@ -241,6 +241,7 @@ class Ball {
             }
         }
         // walls
+        this.reflected = {x:false, y:false};
         this.collisionHandler([19, 60, -19, 840]) 
         this.collisionHandler([850, 60, -19, 840])
         this.collisionHandler([0, 79, 850, -19])
@@ -251,6 +252,7 @@ class Ball {
             this.wait();
         }
         //bricks
+        this.reflected = {x:false, y:false};
         for(var b of Bricks){
             if(this.collisionHandler(b.brickCor)){
                 b.onhit(this.multiplier)
