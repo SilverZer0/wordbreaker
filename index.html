@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>WordBreaker</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="stylesheet.css">
+    </head>
+    <body>
+        <textarea id="textInput" class="menu" rows="30" cols="75" spellcheck="false"></textarea>
+        <a class="menu InputWrapper">
+            <input id="lives" class="menu Input" type="number" placeholder="Lives (3)">
+            <select id="gamemode" class="menu Input">
+                <option value="words">words</option>
+                <option value="letters">letters</option>
+                <option value="uppercase">uppercase</option>
+            </select>
+            <select id="levels" class="menu Input" onChange="loadLevel()">
+                <option value="level_0">level 0</option>
+                <option value="level_1">level 1</option>
+            </select>
+        </a>
+        <button id="startButton" class="menu" onclick="load()">Start</button>
+        <canvas id="gameScreen" class="game"></canvas>
+        <img id="ball" src="ball.png" class="game"/>
+        <img id="pad" src="pad.png" class="game"/>
+        <script src="levels.js"></script>
+        <script src="code.js"></script>
+    </body>
+</html>

@@ -1,0 +1,32 @@
+body > *{
+    display: block;
+    margin: 0 auto;
+}
+.InputWrapper{
+    display: flex;
+    justify-content: center;
+}
+.game{
+    display: none;
+}
+.Input{
+    padding: unset;
+    font-size: 20px;
+    margin: 2px;
+    margin-top: 10px;
+    width: 100px;
+}
+#textInput{
+    font-size: 20px;
+    text-align: center;
+    white-space: pre-wrap;
+}
+#startButton{
+    width: 100px;
+    height: 50px;
+    margin-top: 8px;
+    font-size: 20px
+}
+#gameScreen{
+    border: 1px solid #000000;
+}
