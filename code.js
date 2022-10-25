@@ -3,8 +3,7 @@ var audio = {"brick":new Audio("brick.ogg"), "pad":new Audio("pad.ogg")};
 var Bricks, ball, pad, input, score, lives, gamemode;
 var speed = 10;
 loadLevel()
-//test
-//test2
+
 function load(){
     lives = 3;
     score = 0;
