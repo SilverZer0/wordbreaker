@@ -120,7 +120,7 @@ function gameloop(){
 
     setTimeout(() => {
         requestAnimationFrame(gameloop);
-    }, 1000 / fps);
+    }, 1000 / 60);
 }
 
 function drawInfo(){
