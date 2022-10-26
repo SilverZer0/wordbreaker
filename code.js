@@ -275,7 +275,7 @@ class Ball {
         if(this.del){return}
         ctx.clearRect(...extendCor(...this.Cor))
         if(this.sticky){
-            this.Cor[0] = pad.Cor[0]+pad.Cor[2]/2;
+            this.Cor[0] = pad.Cor[0]+pad.Cor[2]/2-10;
             ctx.drawImage(this.img, ...this.Cor);
             return;
         }
