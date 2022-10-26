@@ -44,9 +44,12 @@ function start(caller){
     pad = new Pad(input)
     ball = new Ball();
     ball.wait();
+    requestAnimationFrame(gameloop);
+    /*
     setTimeout(() => {
         requestAnimationFrame(gameloop);
     }, 1000 / 60);
+    */
 }
 
 function end(){
@@ -118,9 +121,12 @@ function gameloop(){
         return;
     }
 
+    requestAnimationFrame(gameloop);
+    /*
     setTimeout(() => {
         requestAnimationFrame(gameloop);
     }, 1000 / 60);
+    */
 }
 
 function drawInfo(){
