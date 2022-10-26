@@ -1,13 +1,17 @@
 var ctx = document.getElementById("gameScreen").getContext("2d");
 var audio = {"brick":new Audio("brick.ogg"), "pad":new Audio("pad.ogg")};
-var Bricks, ball, pad, input, score, lives, gamemode;
+var Bricks, Balls, pad, Powerups, score, lives, gamemode, barrier;
 var speed = 10;
+var powChance = 50//1/x per Powerup
 loadLevel()
 
 function load(){
     lives = 3;
     score = 0;
+    Balls = [];
     Bricks = [];
+    Powerups = [];
+    barrier = false;
     for(var i of document.getElementsByClassName("menu")){
         i.style.display = "none"
     }
@@ -42,8 +46,7 @@ function start(caller){
         input = "Mouse";
     }
     pad = new Pad(input)
-    ball = new Ball();
-    ball.wait();
+    Balls.push(new Ball());
     requestAnimationFrame(gameloop);
 }
 
@@ -92,15 +95,33 @@ function makeBricks(text){
 function gameloop(){
     var startTime = window.performance.now();
 
+    if(barrier){
+        ctx.fillStyle='#00FFFF';
+        ctx.fillRect(0, 895, 850, 5);
+        ctx.fillStyle="#000000"
+    }
+
     pad.update();
     for(var i=0;i<speed;i++){
-        ball.update();
-        Bricks = Bricks.filter((i)=>!i.del)
+        for(var o of Balls){
+            o.update();
+        }
+        Bricks = Bricks.filter((b)=>!b.del)
     }
-    for(var i of Bricks){
-        i.draw();
+    Balls = Balls.filter((b)=>!b.del)
+    for(var o of Powerups){
+        o.update();
+    }
+    Powerups = Powerups.filter((b)=>!b.del)
+    for(var o of Bricks){
+        o.draw();
     }
     drawInfo();
+
+    if(Balls.length == 0){
+        lives -= 1
+        Balls.push(new Ball())
+    }
 
     if(Bricks.length == 0 || lives == 0){
         ctx.clearRect(0,0,850,900)
@@ -205,6 +226,21 @@ class Brick {
     break(multiplier) {
         score += 100*multiplier
         ctx.clearRect(...extendCor(...this.brickCor))
+        switch (Math.floor(Math.random()*powChance)){
+            case 0:
+                Powerups.push(new Powerup("+life", 0, this.brickCor))
+                break;
+            case 1:
+                Powerups.push(new Powerup("+ball", 0, this.brickCor))
+                break;
+            case 2:
+                Powerups.push(new Powerup("barrier", 10000, this.brickCor))
+                break;
+            case 3:
+                Powerups.push(new Powerup("wide", 10000, this.brickCor))
+                break;
+        }
+        
         this.del = true;
     }
 }
@@ -219,47 +255,33 @@ class Ball {
         this.moveY;
         this.reflected;
         this.multiplier = 1;
+        this.del = false;
+        this.wait();
     }
     wait() {
         this.sticky = true;
-        if(input == "Mouse"){
-            document.addEventListener("click", (e) => {ball.sticky = false; });
+        if(pad.input == "Mouse"){
+            document.addEventListener("click", this.go.bind(this));
         }else{
-            document.addEventListener("keydown", (e) => {
-                if(["ArrowUp", "ArrowDown", "Enter", " "].includes(e.key)) {ball.sticky = false;}
-            })
+            document.addEventListener("keydown", this.go.bind(this));
+        }
+    }
+    go(e) {
+        if((pad.input == "Mouse") || (["ArrowUp", "ArrowDown", "Enter", " "].includes(e.key))){
+            this.sticky = false;
         }
     }
     update() {
+        if(this.del){return}
         ctx.clearRect(...extendCor(...this.Cor))
         if(this.sticky){
-            this.Cor[0] = pad.Cor[0]+65
+            this.Cor[0] = pad.Cor[0]+pad.Cor[2]/2;
             ctx.drawImage(this.img, ...this.Cor);
             return;
         }
         this.moveX = Math.cos((this.rot+270)*Math.PI/180)
         this.moveY = Math.sin((this.rot+270)*Math.PI/180)
-        //pad
-        this.reflected = {x:false, y:false};
-        var padX = pad.Cor[0]
-        for(var i=0;i<5;i++){
-            if(this.collisionHandler([padX+i*30+10*(i>0), 800, 10+10*(i==0 || i==4), -19])){
-                this.multiplier = 1;
-                this.rot += 10*(i-2);
-                audio["pad"].play()
-            }
-        }
-        // walls
-        this.reflected = {x:false, y:false};
-        this.collisionHandler([19, 60, -19, 840]) 
-        this.collisionHandler([850, 60, -19, 840])
-        this.collisionHandler([0, 79, 850, -19])
-        if(this.collisionHandler([0, 900, 850, -19])){
-            lives -= 1
-            this.Cor = [pad.Cor[0]+65,778,20,20]
-            this.rot = (Math.random()*90+315)%360;
-            this.wait();
-        }
+
         //bricks
         this.reflected = {x:false, y:false};
         for(var b of Bricks){
@@ -269,6 +291,28 @@ class Ball {
                 this.multiplier ++;
             }
         }
+         // walls
+         this.reflected = {x:false, y:false};
+         this.collisionHandler([19, 60, -19, 840]) 
+         this.collisionHandler([850, 60, -19, 840])
+         this.collisionHandler([0, 79, 850, -19])
+         if(this.collisionHandler([0, 900, 850, -19])){
+             if(!barrier){
+                 this.del = true;
+                 return;
+             }
+         }
+         //pad
+         this.reflected = {x:false, y:false};
+         var padX = pad.Cor[0];
+         var padW = pad.Cor[2]/5;
+         for(var i=0;i<5;i++){
+             if(this.collisionHandler([padX+i*padW+10*(i>0), 800, (padW-20)+10*(i==0 || i==4), -19])){
+                 this.multiplier = 1;
+                 this.rot += 10*(i-2);
+                 audio["pad"].play()
+             }
+         }
 
         this.Cor[0] += this.moveX;
         this.Cor[1] += this.moveY;
@@ -299,10 +343,11 @@ class Ball {
 }
 
 class Pad {
-    constructor() {
+    constructor(input) {
         this.img = document.getElementById("pad");
         this.Cor = [350,800,150,20]
         this.target = 350;
+        this.input = input;
         if(input == "Mouse"){
             this.move = this._mouseMove
             document.addEventListener("mousemove", (e) => pad.move(e));
@@ -314,25 +359,75 @@ class Pad {
     }
     _mouseMove(e) {
         var canvasX = document.getElementById("gameScreen").getBoundingClientRect().left;
-        this.target = e.x-canvasX-75;
+        this.target = e.x-canvasX;
     }
     _keysMove(e){
         if(e.type == "keyup"){
-            this.target = this.Cor[0];
+            this.target = this.Cor[0]+this.Cor[2]/2;;
         }else if(e.key == "ArrowLeft"){
             this.target = 0;
         }else if(e.key == "ArrowRight"){
-            this.target = 700
+            this.target = 850
         }
     }
     update() {
         ctx.clearRect(...extendCor(...this.Cor))
-        this.Cor[0] = [0, this.Cor[0]-10, this.target, this.Cor[0]+10, 700].sort((a,b)=>a-b)[2]
+        var center = this.Cor[0]+this.Cor[2]/2;
+        this.Cor[0] += [0+this.Cor[2]/2, center-10, this.target, 
+            center+10, 850-this.Cor[2]/2].sort((a,b)=>a-b)[2]-center;
         ctx.drawImage(this.img, ...this.Cor);
+    }
+}
+
+class Powerup {
+    constructor(type, time, Cor) {
+        this.time = time;
+        this.rectCor = [Cor[0]+Cor[2]/2-10, Cor[1], 20, 20]
+        this.powCor = [Cor[0]+Cor[2]/2, Cor[1]+Cor[3]/2, 10, 0, 2*Math.PI];
+        this.del = false;
+        this.color = {'+life':'#EB73FF', '+ball':'#FFD800',
+            'barrier':'#00FFFF', 'wide':'#4800FF'}[type];
+        this.effect = {
+            '+life':   ()=>{lives+=1}, 
+            '+ball':   ()=>{Balls.push(new Ball())},
+            'barrier': ()=>{barrier=true},
+            'wide':    ()=>{pad.Cor[0]-=50;pad.Cor[2]+=100}
+        }[type];
+        this.effectEnd = {
+            '+life':   ()=>{},
+            '+ball':   ()=>{},
+            'barrier': ()=>{barrier=false;ctx.clearRect(0, 895, 850, 5)},
+            'wide':    ()=>{ctx.clearRect(...extendCor(...pad.Cor));pad.Cor[0]+=50;pad.Cor[2]-=100}
+        }[type];
+    }
+    update() {
+        ctx.clearRect(...extendCor(...this.rectCor));
+        if(this.powCor[1] > 790 && this.powCor[1] < 830 && 
+            this.rectCor[0] < pad.Cor[0]+pad.Cor[2] && this.rectCor[0]+20 > pad.Cor[0]){
+            this.del = true;
+            this.effect();
+            setTimeout(this.effectEnd, this.time); 
+            return;    
+        }
+        if(this.powCor[0]>900){
+            this.del;
+            return;
+        }
+        this.rectCor[1] += 2;
+        this.powCor[1] += 2;
+        ctx.beginPath();
+        ctx.arc(...this.powCor);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#003300';
+        ctx.stroke();
     }
 }
 
 /* TODO
 more levels 
-powerups
+more powerups (add negative?)
+onsided collision-Boxes (walls, pad)
+add distance wall<->bricks
 */
