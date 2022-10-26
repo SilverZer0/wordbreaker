@@ -45,11 +45,6 @@ function start(caller){
     ball = new Ball();
     ball.wait();
     requestAnimationFrame(gameloop);
-    /*
-    setTimeout(() => {
-        requestAnimationFrame(gameloop);
-    }, 1000 / 60);
-    */
 }
 
 function end(){
@@ -95,6 +90,8 @@ function makeBricks(text){
 }
 
 function gameloop(){
+    var startTime = window.performance.now();
+
     pad.update();
     for(var i=0;i<speed;i++){
         ball.update();
@@ -121,12 +118,8 @@ function gameloop(){
         return;
     }
 
+    waitForFPS(startTime);
     requestAnimationFrame(gameloop);
-    /*
-    setTimeout(() => {
-        requestAnimationFrame(gameloop);
-    }, 1000 / 60);
-    */
 }
 
 function drawInfo(){
@@ -151,6 +144,12 @@ function extendCor(x,y,w,h){
 function randomColor(){
     var colors = ["#3278C8", "#DC6428", "#C85078", "#73FF4B"];
     return colors[Math.floor((Math.random()*colors.length))];
+}
+
+function waitForFPS(startTime){
+    while(window.performance.now()-startTime < 1000/60){
+        continue;
+    }
 }
 
 class Brick {
