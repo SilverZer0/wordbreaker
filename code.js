@@ -226,7 +226,7 @@ class Ball {
         }
     }
     update() {
-        ctx.clearRect(...this.Cor)
+        ctx.clearRect(...extendCor(...this.Cor))
         if(this.sticky){
             this.Cor[0] = pad.Cor[0]+65
             ctx.drawImage(this.img, ...this.Cor);
