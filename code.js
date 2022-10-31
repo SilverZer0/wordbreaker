@@ -318,7 +318,13 @@ class Ball {
         this.Cor[1] += this.moveY;
         ctx.drawImage(this.img, ...this.Cor);
     }
+    brickcollision(bCor) {
+        // make four wall for collision, do with collHandler, return result
+    }
     collisionHandler(bCor) {
+        //TODO only acept one wall and bounce it
+        // -> add param isY
+        // -> switch to rect coll for bricks
         var bounced = false;
         var quater = Math.floor(this.rot/90);
         var x = bCor[0]-10+(bCor[2]+20)*(quater>=2);
@@ -427,6 +433,7 @@ class Powerup {
 
 /* TODO
 more levels 
+see TODO class ball
 more powerups (add negative?)
 onsided collision-Boxes (walls, pad)
 add distance wall<->bricks
