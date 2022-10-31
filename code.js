@@ -433,7 +433,7 @@ class Powerup {
 
 /* TODO
 more levels 
-see TODO class ball
+see TODO class Ball
 more powerups (add negative?)
 onsided collision-Boxes (walls, pad)
 add distance wall<->bricks
