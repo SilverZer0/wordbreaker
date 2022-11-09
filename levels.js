@@ -24,7 +24,7 @@ consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis
 level_1:{mode:"letters",
 text:`\
 The  quick  brown  fox  jumps  over  the  lazy  dog
-The                            
+The                                                
 quick                                    
 brown                      
 fox          
