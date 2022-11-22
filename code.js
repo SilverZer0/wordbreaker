@@ -2,7 +2,7 @@ const ctx = document.getElementById("gameScreen").getContext("2d");
 const audio = {"brick":new Audio("brick.ogg"), "pad":new Audio("pad.ogg")};
 var Bricks, Balls, pad, Powerups, score, lives, gamemode, barrier;
 var speed = 10;
-var powChance = 50//1/x per Powerup
+var powChance = 50// 1/x per Powerup
 loadLevel()
 
 function load(){
