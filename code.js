@@ -430,11 +430,3 @@ class Powerup {
         ctx.stroke();
     }
 }
-
-/* TODO
-more levels 
-see TODO in class Ball (collision)
-more powerups (add negative?)
-onsided collision-Boxes (walls, pad)
-add distance wall<->bricks
-*/
